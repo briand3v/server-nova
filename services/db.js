@@ -1,25 +1,24 @@
 const MongoClient = require('mongodb').MongoClient;
 
-class DB{
+const dbservice = {
+	config: {
+		poolSize: 10,
+		useNewUrlParser: true
+	},
+	supernova: null,
+	db: null,
+	connect : (done) => {
+		MongoClient.connect(process.env.DB_URI,this.config,(err,dbase) => {
+			if(err) return done(err)
 
-	constructor(){
-		this.db = null;
-		this.url = process.env.DB_URI;
-		this.options = {
-			useNewUrlParser: true,
-			bufferMaxEntries: 0,
-			reconnectTries: 5000
-		}
+			dbservice.db = dbase.db(process.env.BD_NAME)
+			console.log('[v] Conection established to '+process.env.DB_NAME+'!')
+			done(null);
+		})
+	},
+	getdb: () => {
+		return dbservice.db
 	}
-
-	econnection(){
-		if(this.db) return new Promise.resolve(this.db)
-			return MongoClient.connect(this.url, this.options).then((client)=> this.db = client.db(process.env.BD_NAME))
-	}
-	dbase(){
-		return this.db;
-	}
-	
 }
 
-module.exports = DB
+module.exports = dbservice

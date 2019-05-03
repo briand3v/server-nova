@@ -1,30 +1,34 @@
-/**
- * Declaracion de la clase.
- */
-/* DB */
- 
- /* Models */
-var UserSchema = require('../models/user');
+'use strict'
 
-var db = require('../dbconnection')
+var Singletondb = require('../dbconnection');
+var multer = require('multer')
+var path = require('path')
 
-class Nova {
 
-	/**
-     * Main medthod to init our class
-     *
-     * @return void.
-     */
-	constructor(superdb){
-		this.db = superdb;
-		this.config = null;
-	}
-
-	getdbase(){
-		return this.db;
-	}
-	
+const config = {
+	actions: 'basic actions',
+	user: 'brianmc',
+	mode: 'basic app',
+	aname: ['nova', 'jarvis', 'friday']
 }
 
-module.exports = Nova
 
+const uploadImages = () => {
+	const options = {
+		storage : multer.diskStorage({
+			destination: (req, file, cb) => {
+				cb(null, "./public/images/")
+			},
+			filename: (req, file, cb) => {
+				cb(null, `${Date.now()}${path.extname(file.originalname)}`);
+			}
+		})
+	}
+	return multer(options)
+}
+
+
+module.exports = {
+	uploadImages,
+	config
+}

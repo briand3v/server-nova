@@ -13,47 +13,47 @@ var cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth/authorization');
+var cardsRouter = require('./routes/cards');
 
-//Main controller
-var Nova = require('./services/nova');
-var dbaservice = require('./dbconnection');
-var userSchema = require('./models/user');
+//init server
+var nova = require('./services/nova');
+var novadb = require('./services/db');
+
 
 var connectpromise = new Promise((resolve, reject) => {
-  dbaservice.connect(function(err){
+  novadb.connect((err)=>{
     if(err){
-      process.exit(1)
-    } else{
-      var db = dbaservice.db;
-      resolve(db)
+      console.log(err)
     }
+    resolve(novadb.getdb())
   })
+  
 })
-connectpromise.then((data) => {
-  data.createCollection('users', userSchema)
+
+//// init creating the collections validate we are going to use ///////
+connectpromise.then((db) => {
+  console.log('@@@@@@@ Nova config@@@@@@@@@')
+  console.log(nova.config)
+  console.log('@@@@@@@ Nova app ready @@@@@@@@@')
 })
 connectpromise.catch((err) => {
   if(err) console.log('[x] something with the data base went wrong!!')
 })
+///////////////////////////////////////////////////////////////////////
 
 
 var app = express();
-var dbName = 'briandb';
-
-
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
 app.use(logger('dev'));
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'todo-nova',
@@ -103,6 +103,7 @@ app.use(function (req, res, next) {
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth',authRouter);
+app.use('/cards',cardsRouter);
 
 
 // catch 404 and forward to error handler

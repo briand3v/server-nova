@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var dbase = require('../../dbconnection')
-var User = require('../../models/user')
+
 var response = require('../../helpers/response')
 var bcrypt = require('bcrypt');
 
